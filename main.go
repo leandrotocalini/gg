@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"regexp"
 	"sort"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/leandrotocalini/gg/internal"
 )
 
 func main() {
@@ -53,16 +53,16 @@ func handleCommand(cmd string, args []string) {
 
 func handleCommit(args []string) {
 	msg := strings.Join(args, " ")
-	runWithConfirm("git", "commit", "-am", msg)
+	internal.RunWithConfirm("git", "commit", "-am", msg)
 }
 
 func handlePush() {
-	err := runWithConfirm("git", "push")
+	err := internal.RunWithConfirm("git", "push")
 	if err != nil {
 		// Detect specific upstream error
 		if strings.Contains(err.Error(), "exit status 128") {
 			// Detect current branch
-			currentBranch := getCurrentBranch()
+			currentBranch := internal.GetCurrentBranch()
 			if currentBranch != "" {
 				fmt.Println("⚠️ No upstream branch set.")
 				fmt.Printf("Suggesting: git push --set-upstream origin %s\n", currentBranch)
@@ -73,7 +73,7 @@ func handlePush() {
 				resp = strings.TrimSpace(strings.ToLower(resp))
 
 				if resp == "y" || resp == "yes" {
-					run("git", "push", "--set-upstream", "origin", currentBranch)
+					internal.Run("git", "push", "--set-upstream", "origin", currentBranch)
 				} else {
 					fmt.Println("You can run it manually:")
 					fmt.Printf("git push --set-upstream origin %s\n", currentBranch)
@@ -85,21 +85,12 @@ func handlePush() {
 	}
 }
 
-func getCurrentBranch() string {
-	cmd := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
-	out, err := cmd.Output()
-	if err != nil {
-		return ""
-	}
-	return strings.TrimSpace(string(out))
-}
-
 func handleAdd(args []string) {
-	runWithConfirm("git", append([]string{"add"}, args...)...)
+	internal.RunWithConfirm("git", append([]string{"add"}, args...)...)
 }
 
 func handleCheckout(args []string) {
-	runWithConfirm("git", append([]string{"checkout"}, args...)...)
+	internal.RunWithConfirm("git", append([]string{"checkout"}, args...)...)
 }
 
 func handleNewBranch(args []string) {
@@ -123,7 +114,7 @@ func handleNewBranch(args []string) {
 		return
 	}
 
-	run("git", "checkout", "-b", cleaned)
+	internal.Run("git", "checkout", "-b", cleaned)
 }
 
 func cleanBranchName(input string) string {
@@ -258,29 +249,4 @@ func handleLog() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func runWithConfirm(name string, args ...string) error {
-	fullCmd := name + " " + strings.Join(args, " ")
-	fmt.Println("Command to execute:", fullCmd)
-	fmt.Print("Proceed? [y/N]: ")
-
-	reader := bufio.NewReader(os.Stdin)
-	resp, _ := reader.ReadString('\n')
-	resp = strings.TrimSpace(strings.ToLower(resp))
-
-	if resp != "y" && resp != "yes" {
-		fmt.Println("Aborted.")
-		return nil
-	}
-
-	return run(name, args...)
-}
-
-func run(name string, args ...string) error {
-	cmd := exec.Command(name, args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-	return cmd.Run()
 }
