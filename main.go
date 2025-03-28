@@ -17,35 +17,61 @@ func main() {
 	cmd := os.Args[1]
 	args := os.Args[2:]
 
-	var gitCmd []string
+	handleCommand(cmd, args)
+}
 
+func handleCommand(cmd string, args []string) {
 	switch cmd {
-	case "c": // Commit
-		msg := strings.Join(args, " ")
-		gitCmd = []string{"commit", "-am", msg}
-
-	case "p": // Push
-		gitCmd = []string{"push"}
-
-	case "s": // Status
-		gitCmd = []string{"status"}
-
-	case "a": // Add
-		gitCmd = append([]string{"add"}, args...)
-
-	case "co": // Checkout
-		gitCmd = append([]string{"checkout"}, args...)
-
-	case "nb": // New branch
-		gitCmd = append([]string{"checkout", "-b"}, args...)
-
+	case "c":
+		handleCommit(args)
+	case "p":
+		handlePush()
+	case "s":
+		handleStatus()
+	case "a":
+		handleAdd(args)
+	case "co":
+		handleCheckout(args)
+	case "nb":
+		handleNewBranch(args)
 	default:
 		fmt.Println("Unknown command:", cmd)
-		return
 	}
+}
 
-	// Show the command and ask for confirmation
-	fullCmd := "git " + strings.Join(gitCmd, " ")
+// Commands with confirmation
+
+func handleCommit(args []string) {
+	msg := strings.Join(args, " ")
+	runWithConfirm("git", "commit", "-am", msg)
+}
+
+func handlePush() {
+	runWithConfirm("git", "push")
+}
+
+func handleAdd(args []string) {
+	runWithConfirm("git", append([]string{"add"}, args...)...)
+}
+
+func handleCheckout(args []string) {
+	runWithConfirm("git", append([]string{"checkout"}, args...)...)
+}
+
+func handleNewBranch(args []string) {
+	runWithConfirm("git", append([]string{"checkout", "-b"}, args...)...)
+}
+
+// Commands without confirmation
+
+func handleStatus() {
+	run("git", "status")
+}
+
+// Utility functions
+
+func runWithConfirm(name string, args ...string) {
+	fullCmd := name + " " + strings.Join(args, " ")
 	fmt.Println("Command to execute:", fullCmd)
 	fmt.Print("Proceed? [y/N]: ")
 
@@ -58,7 +84,7 @@ func main() {
 		return
 	}
 
-	run("git", gitCmd...)
+	run(name, args...)
 }
 
 func run(name string, args ...string) {
