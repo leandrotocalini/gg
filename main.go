@@ -57,7 +57,41 @@ func handleCommit(args []string) {
 }
 
 func handlePush() {
-	runWithConfirm("git", "push")
+	err := runWithConfirm("git", "push")
+	if err != nil {
+		// Detect specific upstream error
+		if strings.Contains(err.Error(), "exit status 128") {
+			// Detect current branch
+			currentBranch := getCurrentBranch()
+			if currentBranch != "" {
+				fmt.Println("⚠️ No upstream branch set.")
+				fmt.Printf("Suggesting: git push --set-upstream origin %s\n", currentBranch)
+				fmt.Print("Run this now? [y/N]: ")
+
+				reader := bufio.NewReader(os.Stdin)
+				resp, _ := reader.ReadString('\n')
+				resp = strings.TrimSpace(strings.ToLower(resp))
+
+				if resp == "y" || resp == "yes" {
+					run("git", "push", "--set-upstream", "origin", currentBranch)
+				} else {
+					fmt.Println("You can run it manually:")
+					fmt.Printf("git push --set-upstream origin %s\n", currentBranch)
+				}
+			}
+		} else {
+			fmt.Println("Error:", err)
+		}
+	}
+}
+
+func getCurrentBranch() string {
+	cmd := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
+	out, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(out))
 }
 
 func handleAdd(args []string) {
@@ -226,7 +260,7 @@ func handleLog() {
 	}
 }
 
-func runWithConfirm(name string, args ...string) {
+func runWithConfirm(name string, args ...string) error {
 	fullCmd := name + " " + strings.Join(args, " ")
 	fmt.Println("Command to execute:", fullCmd)
 	fmt.Print("Proceed? [y/N]: ")
@@ -237,18 +271,16 @@ func runWithConfirm(name string, args ...string) {
 
 	if resp != "y" && resp != "yes" {
 		fmt.Println("Aborted.")
-		return
+		return nil
 	}
 
-	run(name, args...)
+	return run(name, args...)
 }
 
-func run(name string, args ...string) {
+func run(name string, args ...string) error {
 	cmd := exec.Command(name, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
-	if err := cmd.Run(); err != nil {
-		fmt.Println("Error:", err)
-	}
+	return cmd.Run()
 }
