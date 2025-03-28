@@ -25,7 +25,7 @@ Make sure `$GOBIN` is in your `$PATH`, then run `gg` from anywhere.
 
 | Command               | Description                                | Git Equivalent             |
 |-----------------------|--------------------------------------------|----------------------------|
-| `gg c "msg"`          | Commit with message (`-am`)                | `git commit -am "msg"`     |
+| `gg c new feature asd`| Commit with message (`-am`)                | `git commit -am "new feature asd"`|
 | `gg p`                | Push current branch                        | `git push`                 |
 | `gg a .`              | Add files                                  | `git add .`                |
 | `gg co branch`        | Checkout branch                            | `git checkout branch`      |
