@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 	"time"
 
@@ -46,8 +47,6 @@ func handleCommand(cmd string, args []string) {
 	}
 }
 
-// Commands with confirmation
-
 func handleCommit(args []string) {
 	msg := strings.Join(args, " ")
 	runWithConfirm("git", "commit", "-am", msg)
@@ -65,11 +64,32 @@ func handleCheckout(args []string) {
 	runWithConfirm("git", append([]string{"checkout"}, args...)...)
 }
 
-func handleNewBranch(args []string) {
-	runWithConfirm("git", append([]string{"checkout", "-b"}, args...)...)
+func validateBranchName(branch string) bool {
+	pattern := `^(?:[a-z0-9]+/)?[a-z0-9]+(?:-[a-z0-9]+)*$`
+	matched, err := regexp.MatchString(pattern, branch)
+	if err != nil {
+		return false
+	}
+	return matched
 }
 
-// No confirmation
+func handleNewBranch(args []string) {
+	if len(args) != 1 {
+		fmt.Println("Usage: gg nb <branch-name>")
+		return
+	}
+
+	branch := args[0]
+
+	if !validateBranchName(branch) {
+		fmt.Println("Invalid branch name.")
+		fmt.Println("Use kebab-case (lowercase, dash-separated), optionally prefixed by a type:")
+		fmt.Println("Examples: feature/login-page, fix/session-timeout, login-page")
+		return
+	}
+
+	runWithConfirm("git", "checkout", "-b", branch)
+}
 
 func handleStatus() {
 	r, err := git.PlainOpen(".")
