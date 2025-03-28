@@ -64,31 +64,51 @@ func handleCheckout(args []string) {
 	runWithConfirm("git", append([]string{"checkout"}, args...)...)
 }
 
-func validateBranchName(branch string) bool {
-	pattern := `^(?:[a-z0-9]+/)?[a-z0-9]+(?:-[a-z0-9]+)*$`
-	matched, err := regexp.MatchString(pattern, branch)
-	if err != nil {
-		return false
-	}
-	return matched
-}
-
 func handleNewBranch(args []string) {
-	if len(args) != 1 {
+	if len(args) == 0 {
 		fmt.Println("Usage: gg nb <branch-name>")
 		return
 	}
 
-	branch := args[0]
+	raw := strings.Join(args, " ")
+	cleaned := cleanBranchName(raw)
 
-	if !validateBranchName(branch) {
-		fmt.Println("Invalid branch name.")
-		fmt.Println("Use kebab-case (lowercase, dash-separated), optionally prefixed by a type:")
-		fmt.Println("Examples: feature/login-page, fix/session-timeout, login-page")
+	fmt.Println("Branch to create:", cleaned)
+	fmt.Print("Proceed? [y/N]: ")
+
+	reader := bufio.NewReader(os.Stdin)
+	resp, _ := reader.ReadString('\n')
+	resp = strings.TrimSpace(strings.ToLower(resp))
+
+	if resp != "y" && resp != "yes" {
+		fmt.Println("Aborted.")
 		return
 	}
 
-	runWithConfirm("git", "checkout", "-b", branch)
+	run("git", "checkout", "-b", cleaned)
+}
+
+func cleanBranchName(input string) string {
+	// Trim spaces and lowercase
+	input = strings.ToLower(strings.TrimSpace(input))
+
+	// If there's a slash, split and clean each part separately
+	if strings.Contains(input, "/") {
+		parts := strings.SplitN(input, "/", 2)
+		return cleanSegment(parts[0]) + "/" + cleanSegment(parts[1])
+	}
+
+	return cleanSegment(input)
+}
+
+func cleanSegment(s string) string {
+	s = strings.TrimSpace(s)
+	// Replace all underscores and spaces with hyphens
+	s = strings.ReplaceAll(s, "_", "-")
+	s = regexp.MustCompile(`\s+`).ReplaceAllString(s, "-")
+	s = regexp.MustCompile(`-+`).ReplaceAllString(s, "-") // no double dashes
+	s = strings.Trim(s, "-")
+	return s
 }
 
 func handleStatus() {
