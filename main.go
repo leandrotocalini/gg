@@ -17,14 +17,14 @@ type Command struct {
 
 var commands = []Command{
 	{Name: "c", Description: "Commit with message", Handler: handlers.Commit},
-	{Name: "p", Description: "Push current branch", Handler: func(_ []string) { handlers.Push() }},
-	{Name: "pl", Description: "Pull from remote", Handler: func(_ []string) { handlers.Pull() }},
-	{Name: "s", Description: "Show status", Handler: func(_ []string) { handlers.Status() }},
-	{Name: "a", Description: "Add files", Handler: handlers.Add},
-	{Name: "co", Description: "Checkout branch", Handler: handlers.Checkout},
-	{Name: "cb", Description: "Current branch", Handler: handlers.CurrentBranch},
-	{Name: "nb", Description: "Create new branch", Handler: handlers.NewBranch},
-	{Name: "l", Description: "Show recent commits", Handler: func(_ []string) { handlers.Log() }},
+	{Name: "p", Aliases: []string{"push"}, Description: "Push current branch", Handler: func(_ []string) { handlers.Push() }},
+	{Name: "pl", Aliases: []string{"pull"}, Description: "Pull from remote", Handler: func(_ []string) { handlers.Pull() }},
+	{Name: "s", Aliases: []string{"status"}, Description: "Show status", Handler: func(_ []string) { handlers.Status() }},
+	{Name: "a", Aliases: []string{"add"}, Description: "Add files", Handler: handlers.Add},
+	{Name: "co", Aliases: []string{"checkout"}, Description: "Checkout branch", Handler: handlers.Checkout},
+	{Name: "cb", Aliases: []string{"current-branch"}, Description: "Current branch", Handler: handlers.CurrentBranch},
+	{Name: "nb", Aliases: []string{"new-branch"}, Description: "Create new branch", Handler: handlers.NewBranch},
+	{Name: "l", Aliases: []string{"log"}, Description: "Show recent commits", Handler: func(_ []string) { handlers.Log() }},
 	{Name: "rb", Aliases: []string{"recent"}, Description: "Show recent branches", Handler: func(_ []string) { handlers.RecentBranches() }},
 }
 
