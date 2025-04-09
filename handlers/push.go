@@ -10,6 +10,10 @@ import (
 )
 
 func Push() {
+	if internal.IsProtectedBranch() {
+		fmt.Println("❌ Writing to 'main' or 'master' is not allowed.")
+		return
+	}
 	err := internal.RunWithConfirm("git", "push")
 	if err != nil {
 		// Detect specific upstream error

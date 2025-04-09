@@ -58,7 +58,7 @@ func RecentBranches() {
 		if i >= max {
 			break
 		}
-		fmt.Printf("- %s: %s - %s\n",
+		fmt.Printf("> %s: %s - (%s)\n",
 			b.Name,
 			b.Message,
 			b.Date.Format("2006-01-02 15:04"),
