@@ -41,3 +41,9 @@ func GetCurrentBranch() string {
 	}
 	return strings.TrimSpace(string(out))
 }
+
+func IsProtectedBranch() bool {
+	branch := strings.ToLower(strings.TrimSpace(GetCurrentBranch()))
+	fmt.Println("Current branch:", branch)
+	return branch == "main" || branch == "master"
+}
