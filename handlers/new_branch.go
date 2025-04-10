@@ -41,9 +41,8 @@ func NewBranch(args []string) {
 	cleaned := cleanBranchName(raw)
 
 	ui.PrintWarningf("Branch to create:", cleaned)
-	proceed := internal.ConfirmProceed()
 
-	if !proceed {
+	if !internal.ConfirmProceed() {
 		ui.PrintErrorf("Aborted.")
 		return
 	}

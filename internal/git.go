@@ -19,9 +19,8 @@ func Run(name string, args ...string) error {
 func RunWithConfirm(name string, args ...string) error {
 	fullCmd := name + " " + strings.Join(args, " ")
 	ui.PrintWarningf("Command to execute: %s", fullCmd)
-	proceed := ConfirmProceed()
 
-	if !proceed {
+	if !ConfirmProceed() {
 		ui.PrintErrorf("Aborted.")
 		return nil
 	}
