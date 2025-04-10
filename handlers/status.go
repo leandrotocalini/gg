@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/leandrotocalini/gg/ui"
 )
 
 func Status() {
@@ -28,8 +29,8 @@ func Status() {
 		return
 	}
 
-	fmt.Println("Changes not staged for commit:")
+	ui.PrintErrorf("Changes not staged for commit:")
 	for file, s := range status {
-		fmt.Printf("  %s: %s\n", s.Worktree, file)
+		ui.PrintPlainf("  %s: %s\n", s.Worktree, file)
 	}
 }

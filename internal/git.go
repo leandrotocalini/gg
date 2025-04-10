@@ -19,15 +19,15 @@ func Run(name string, args ...string) error {
 
 func RunWithConfirm(name string, args ...string) error {
 	fullCmd := name + " " + strings.Join(args, " ")
-	ui.PrintWarning("Command to execute: %s", fullCmd)
-	ui.PrintPlain("Proceed? [y/N]: ")
+	ui.PrintWarningf("Command to execute: %s", fullCmd)
+	ui.PrintPlainf("Proceed? [y/N]: ")
 
 	reader := bufio.NewReader(os.Stdin)
 	resp, _ := reader.ReadString('\n')
 	resp = strings.TrimSpace(strings.ToLower(resp))
 
 	if resp != "y" && resp != "yes" {
-		ui.PrintError("Aborted.")
+		ui.PrintErrorf("Aborted.")
 		return nil
 	}
 
@@ -45,6 +45,6 @@ func GetCurrentBranch() string {
 
 func IsProtectedBranch() bool {
 	branch := strings.ToLower(strings.TrimSpace(GetCurrentBranch()))
-	ui.PrintPlain("Current branch:", branch)
+	ui.PrintPlainf("Current branch: %s", branch)
 	return branch == "main" || branch == "master"
 }

@@ -7,5 +7,5 @@ import (
 
 func CurrentBranch(args []string) {
 	cb := internal.GetCurrentBranch()
-	ui.PrintPlain("Current branch: %s", cb)
+	ui.PrintPlainf("Current branch: %s", cb)
 }

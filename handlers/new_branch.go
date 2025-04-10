@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"regexp"
 	"strings"
 
 	"github.com/leandrotocalini/gg/internal"
+	"github.com/leandrotocalini/gg/ui"
 )
 
 func cleanBranchName(input string) string {
@@ -35,22 +35,22 @@ func cleanSegment(s string) string {
 
 func NewBranch(args []string) {
 	if len(args) == 0 {
-		fmt.Println("Usage: gg nb <branch-name>")
+		ui.PrintErrorf("Usage: gg nb <branch-name>")
 		return
 	}
 
 	raw := strings.Join(args, " ")
 	cleaned := cleanBranchName(raw)
 
-	fmt.Println("Branch to create:", cleaned)
-	fmt.Print("Proceed? [y/N]: ")
+	ui.PrintWarningf("Branch to create:", cleaned)
+	ui.PrintWarningf("Proceed? [y/N]: ")
 
 	reader := bufio.NewReader(os.Stdin)
 	resp, _ := reader.ReadString('\n')
 	resp = strings.TrimSpace(strings.ToLower(resp))
 
 	if resp != "y" && resp != "yes" {
-		fmt.Println("Aborted.")
+		ui.PrintErrorf("Aborted.")
 		return
 	}
 
