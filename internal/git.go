@@ -2,10 +2,11 @@ package internal
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/leandrotocalini/gg/ui"
 )
 
 func Run(name string, args ...string) error {
@@ -18,15 +19,15 @@ func Run(name string, args ...string) error {
 
 func RunWithConfirm(name string, args ...string) error {
 	fullCmd := name + " " + strings.Join(args, " ")
-	fmt.Println("Command to execute:", fullCmd)
-	fmt.Print("Proceed? [y/N]: ")
+	ui.PrintWarning("Command to execute:", fullCmd)
+	ui.PrintPlain("Proceed? [y/N]: ")
 
 	reader := bufio.NewReader(os.Stdin)
 	resp, _ := reader.ReadString('\n')
 	resp = strings.TrimSpace(strings.ToLower(resp))
 
 	if resp != "y" && resp != "yes" {
-		fmt.Println("Aborted.")
+		ui.PrintError("Aborted.")
 		return nil
 	}
 
@@ -44,6 +45,6 @@ func GetCurrentBranch() string {
 
 func IsProtectedBranch() bool {
 	branch := strings.ToLower(strings.TrimSpace(GetCurrentBranch()))
-	fmt.Println("Current branch:", branch)
+	ui.PrintPlain("Current branch:", branch)
 	return branch == "main" || branch == "master"
 }
