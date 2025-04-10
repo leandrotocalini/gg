@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"bufio"
 	"os"
 	"os/exec"
 	"strings"
@@ -20,17 +19,12 @@ func Run(name string, args ...string) error {
 func RunWithConfirm(name string, args ...string) error {
 	fullCmd := name + " " + strings.Join(args, " ")
 	ui.PrintWarningf("Command to execute: %s", fullCmd)
-	ui.PrintPlainf("Proceed? [y/N]: ")
+	proceed := ConfirmProceed()
 
-	reader := bufio.NewReader(os.Stdin)
-	resp, _ := reader.ReadString('\n')
-	resp = strings.TrimSpace(strings.ToLower(resp))
-
-	if resp != "y" && resp != "yes" {
+	if !proceed {
 		ui.PrintErrorf("Aborted.")
 		return nil
 	}
-
 	return Run(name, args...)
 }
 

@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"bufio"
-	"os"
 	"regexp"
 	"strings"
 
@@ -43,13 +41,9 @@ func NewBranch(args []string) {
 	cleaned := cleanBranchName(raw)
 
 	ui.PrintWarningf("Branch to create:", cleaned)
-	ui.PrintWarningf("Proceed? [y/N]: ")
+	proceed := internal.ConfirmProceed()
 
-	reader := bufio.NewReader(os.Stdin)
-	resp, _ := reader.ReadString('\n')
-	resp = strings.TrimSpace(strings.ToLower(resp))
-
-	if resp != "y" && resp != "yes" {
+	if !proceed {
 		ui.PrintErrorf("Aborted.")
 		return
 	}
