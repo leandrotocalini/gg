@@ -19,7 +19,7 @@ func Run(name string, args ...string) error {
 
 func RunWithConfirm(name string, args ...string) error {
 	fullCmd := name + " " + strings.Join(args, " ")
-	ui.PrintWarning("Command to execute:", fullCmd)
+	ui.PrintWarning("Command to execute: %s", fullCmd)
 	ui.PrintPlain("Proceed? [y/N]: ")
 
 	reader := bufio.NewReader(os.Stdin)
